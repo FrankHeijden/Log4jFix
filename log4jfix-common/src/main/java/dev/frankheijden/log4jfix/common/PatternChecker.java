@@ -4,7 +4,7 @@ import java.util.regex.Pattern;
 
 public class PatternChecker {
 
-    private static final Pattern EXPLOIT_PATTERN = Pattern.compile("\\$\\{jndi\\:*.*\\}");
+    private static final Pattern EXPLOIT_PATTERN = Pattern.compile("\\$\\{(jndi|sys|env|java|lower)\\:.*\\}", Pattern.CASE_INSENSITIVE);
 
     private PatternChecker() {}
 
