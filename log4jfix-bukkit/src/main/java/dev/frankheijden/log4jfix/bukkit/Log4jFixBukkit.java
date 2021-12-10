@@ -26,7 +26,7 @@ public class Log4jFixBukkit extends JavaPlugin {
 
                 if (PatternChecker.isExploit(message)) {
                     event.setCancelled(true);
-                    PacketContainer packet = new PacketContainer(PacketType.Play.Client.CHAT);
+                    PacketContainer packet = new PacketContainer(PacketType.Play.Server.CHAT);
                     event.setPacket(packet);
                 }
             }
