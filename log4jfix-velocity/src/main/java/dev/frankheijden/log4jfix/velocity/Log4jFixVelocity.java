@@ -9,11 +9,13 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
+import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import com.velocitypowered.proxy.protocol.packet.Chat;
 import dev.frankheijden.log4jfix.common.PatternChecker;
 import dev.frankheijden.log4jfix.common.ReflectionUtils;
 import io.netty.channel.Channel;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -102,7 +104,10 @@ public class Log4jFixVelocity {
         private boolean canWrite(Object obj) {
             if (obj instanceof Chat) {
                 Chat chat = (Chat) obj;
-                if (PatternChecker.isExploit(chat.getMessage())) {
+                Component component = ProtocolUtils.getJsonChatSerializer(connectedPlayer.getProtocolVersion()).deserialize(chat.getMessage());
+                String message = PlainTextComponentSerializer.plainText().serialize(component);
+
+                if (PatternChecker.isExploit(message)) {
                     logger.severe("Prevented log4j exploit from being sent to " + connectedPlayer.getUsername());
                     return false;
                 }

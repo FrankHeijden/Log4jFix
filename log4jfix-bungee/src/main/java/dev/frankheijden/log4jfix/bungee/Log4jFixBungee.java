@@ -4,10 +4,12 @@ import dev.frankheijden.log4jfix.common.PatternChecker;
 import dev.frankheijden.log4jfix.common.ReflectionUtils;
 import io.netty.channel.Channel;
 import net.md_5.bungee.UserConnection;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.protocol.packet.Chat;
@@ -101,7 +103,9 @@ public class Log4jFixBungee extends Plugin implements Listener {
         private boolean canWrite(Object obj) {
             if (obj instanceof Chat) {
                 Chat chat = (Chat) obj;
-                if (PatternChecker.isExploit(chat.getMessage())) {
+                String message = TextComponent.toPlainText(ComponentSerializer.parse(chat.getMessage()));
+
+                if (PatternChecker.isExploit(message)) {
                     getLogger().severe("Prevented log4j exploit from being sent to " + userConnection.getName());
                     return false;
                 }

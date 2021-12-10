@@ -6,6 +6,8 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import dev.frankheijden.log4jfix.common.PatternChecker;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Log4jFixBukkit extends JavaPlugin {
@@ -17,10 +19,11 @@ public class Log4jFixBukkit extends JavaPlugin {
             @Override
             public void onPacketSending(PacketEvent event) {
                 WrapperPlayServerChat wrapper = new WrapperPlayServerChat(event.getPacket());
-                WrappedChatComponent message = wrapper.getMessage();
-                if (message == null) return;
+                WrappedChatComponent component = wrapper.getMessage();
+                if (component == null) return;
+                String message = TextComponent.toPlainText(ComponentSerializer.parse(component.getJson()));
 
-                if (PatternChecker.isExploit(message.getJson())) {
+                if (PatternChecker.isExploit(message)) {
                     event.setCancelled(true);
                 }
             }
