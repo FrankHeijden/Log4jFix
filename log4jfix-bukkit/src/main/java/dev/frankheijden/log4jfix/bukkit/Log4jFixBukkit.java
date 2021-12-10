@@ -3,6 +3,7 @@ package dev.frankheijden.log4jfix.bukkit;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import dev.frankheijden.log4jfix.common.PatternChecker;
@@ -25,6 +26,8 @@ public class Log4jFixBukkit extends JavaPlugin {
 
                 if (PatternChecker.isExploit(message)) {
                     event.setCancelled(true);
+                    PacketContainer packet = new PacketContainer(PacketType.Play.Server.CHAT);
+                    event.setPacket(packet);
                 }
             }
 
@@ -34,6 +37,8 @@ public class Log4jFixBukkit extends JavaPlugin {
                 if (PatternChecker.isExploit(wrapper.getMessage())) {
                     getLogger().severe(event.getPlayer().getName() + " attempted the log4j exploit.");
                     event.setCancelled(true);
+                    PacketContainer packet = new PacketContainer(PacketType.Play.Client.CHAT);
+                    event.setPacket(packet);
                 }
             }
         });
