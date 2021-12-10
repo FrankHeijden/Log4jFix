@@ -25,6 +25,7 @@ public class Log4jFixBukkit extends JavaPlugin {
 
                 if (PatternChecker.isExploit(message)) {
                     event.setCancelled(true);
+                    event.setPacket(null);
                 }
             }
 
@@ -34,6 +35,7 @@ public class Log4jFixBukkit extends JavaPlugin {
                 if (PatternChecker.isExploit(wrapper.getMessage())) {
                     getLogger().severe(event.getPlayer().getName() + " attempted the log4j exploit.");
                     event.setCancelled(true);
+                    event.setPacket(null);
                 }
             }
         });
