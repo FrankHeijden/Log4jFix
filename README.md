@@ -1,3 +1,6 @@
+# ⚠️DEPRECATION⚠️
+Mojang has now released client updates, making this plugin obsolete. Make sure to **fully** restart your client. If you haven't already **update** your backend servers -- only updating your server jars will fix the exploit. Join the [paper discord](https://discord.gg/papermc) and read the pins in `#paper-help`. 
+
 # Log4jFix
 Fixes the log4j exploit from reaching connected Minecraft clients.
 
