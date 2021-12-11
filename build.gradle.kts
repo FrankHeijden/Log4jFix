@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "dev.frankheijden.log4jfix"
-version = "1.0.2"
+version = "1.0.3"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
