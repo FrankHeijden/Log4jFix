@@ -11,11 +11,22 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Log4jFixBukkit extends JavaPlugin {
+
+    private static final boolean adventure;
+    static {
+        boolean hasAdventureComponentClass;
+        try {
+            Class.forName("net.kyori.adventure.text.Component");
+            hasAdventureComponentClass = true;
+        } catch (ClassNotFoundException ex) {
+            hasAdventureComponentClass = false;
+        }
+        adventure = hasAdventureComponentClass;
+    }
 
     @Override
     public void onEnable() {
@@ -25,7 +36,7 @@ public class Log4jFixBukkit extends JavaPlugin {
             public void onPacketSending(PacketEvent event) {
                 for (int i = 0; i < event.getPacket().getModifier().size(); i++) {
                     Object modifier = event.getPacket().getModifier().read(i);
-                    if (modifier instanceof Component) {
+                    if (adventure && modifier instanceof Component) {
                         if (PatternChecker.isExploit(GsonComponentSerializer.gson().serialize((Component) modifier))
                                 || PatternChecker.isExploit(PlainComponentSerializer.plain().serialize((Component) modifier))) {
                             event.setCancelled(true);
@@ -33,7 +44,7 @@ public class Log4jFixBukkit extends JavaPlugin {
                         }
                     } else if (modifier instanceof BaseComponent[]) {
                         if (PatternChecker.isExploit(ComponentSerializer.toString((BaseComponent[]) modifier))
-                                || PatternChecker.isExploit(TextComponent.toPlainText((BaseComponent[]) modifier))) {
+                                || PatternChecker.isExploit(BaseComponent.toPlainText((BaseComponent[]) modifier))) {
                             event.setCancelled(true);
                             return;
                         }
@@ -46,7 +57,7 @@ public class Log4jFixBukkit extends JavaPlugin {
 
                     String json = chatComponent.getJson();
                     if (PatternChecker.isExploit(json)
-                            || PatternChecker.isExploit(PlainComponentSerializer.plain().serialize(GsonComponentSerializer.gson().deserialize(json)))) {
+                            || PatternChecker.isExploit(toPlainText(json))) {
                         event.setCancelled(true);
                         return;
                     }
@@ -59,7 +70,7 @@ public class Log4jFixBukkit extends JavaPlugin {
                     for (WrappedChatComponent chatComponent : chatComponents) {
                         String json = chatComponent.getJson();
                         if (PatternChecker.isExploit(json)
-                                || PatternChecker.isExploit(PlainComponentSerializer.plain().serialize(GsonComponentSerializer.gson().deserialize(json)))) {
+                                || PatternChecker.isExploit(toPlainText(json))) {
                             event.setCancelled(true);
                             return;
                         }
@@ -78,6 +89,14 @@ public class Log4jFixBukkit extends JavaPlugin {
                 }
             }
         });
+    }
+
+    private String toPlainText(String json) {
+        if (adventure) {
+            return PlainComponentSerializer.plain().serialize(GsonComponentSerializer.gson().deserialize(json));
+        } else {
+            return BaseComponent.toPlainText(ComponentSerializer.parse(json));
+        }
     }
 
     @Override
